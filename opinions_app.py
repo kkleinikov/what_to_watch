@@ -1,4 +1,6 @@
+from datetime import datetime
 import os
+from random import randrange
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -9,10 +11,30 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
 )
 db = SQLAlchemy(app)
 
+
+
+class Opinion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(128), nullable=False)
+    text = db.Column(db.Text, unique=True, nullable=False)
+    source = db.Column(db.String(256))
+    timestamp = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
 @app.route('/')
 def index_view():
-    print(app.config)
-    return 'Совсем скоро тут будет случайное мнение о фильме!'
+    quantity = Opinion.query.count()
+    if not quantity:
+        return '''
+            <h1>Скоро тут будет случайное мнение о фильме!</h1>
+            <p>Но пока что нет ни одного мнения.</p>
+        '''
+    offset_value = randrange(quantity)
+    opinion = Opinion.query.offset(offset_value).first()
+    return opinion.text
 
 if __name__ == '__main__':
     # app.run()
