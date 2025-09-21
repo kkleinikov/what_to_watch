@@ -1,0 +1,143 @@
+openapi: 3.0.0
+info:
+  title: What to Watch API
+  version: 1.0.0
+  description: Веб-приложение для управления мнениями о фильмах.
+servers:
+  - url: http://localhost:5000
+    description: Локальный сервер Flask
+paths:
+  /api/opinions/:
+    get:
+      summary: Получить список всех мнений
+      responses:
+        '200':
+          description: Список мнений
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Opinion'
+    post:
+      summary: Создать новое мнение
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpinionRequest'
+      responses:
+        '201':
+          description: Мнение успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opinion'
+
+  /api/opinions/{id}/:
+    get:
+      summary: Получить мнение по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Мнение найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opinion'
+    patch:
+      summary: Частично обновить мнение
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpinionPatchRequest'
+      responses:
+        '200':
+          description: Мнение успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opinion'
+    delete:
+      summary: Удалить мнение
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Мнение успешно удалено
+
+  /api/get-random-opinion/:
+    get:
+      summary: Получить случайное мнение
+      responses:
+        '200':
+          description: Случайное мнение
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opinion'
+
+components:
+  schemas:
+    Opinion:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        text:
+          type: string
+        source:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        added_by:
+          type: string
+      required:
+        - id
+        - title
+        - text
+    OpinionRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        text:
+          type: string
+        source:
+          type: string
+        added_by:
+          type: string
+      required:
+        - title
+        - text
+    OpinionPatchRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        text:
+          type: string
+        source:
+          type: string
+        added_by:
+          type: string
