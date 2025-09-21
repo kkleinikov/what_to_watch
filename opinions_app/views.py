@@ -7,13 +7,31 @@ from opinions_app.forms import OpinionForm
 from opinions_app.models import Opinion
 
 
+def random_opinion():
+    """Возвращает случайную запись из модели Opinion.
+
+    Функция подсчитывает общее количество мнений в базе данных.
+    Если мнения присутствуют, генерируется случайное смещение (offset),
+    и выбирается первая запись, начиная с этого смещения.
+    Таким образом, выбирается случайное мнение.
+
+    Returns:
+        Opinion: Объект модели Opinion, если мнения существуют.
+        None: Если в базе данных нет мнений.
+    """
+    quantity = Opinion.query.count()
+    if quantity:
+        offset_value = randrange(quantity)
+        opinion = Opinion.query.offset(offset_value).first()
+        return opinion
+
+
 @app.route('/')
 def index_view():
-    quantity = Opinion.query.count()
-    if not quantity:
+    opinion = random_opinion()
+    if opinion is None:
         abort(500)
-    offset_value = randrange(quantity)
-    opinion = Opinion.query.offset(offset_value).first()
+
     return render_template('opinion.html', opinion=opinion)
 
 
